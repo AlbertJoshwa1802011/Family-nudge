@@ -1,0 +1,3 @@
+-- Optional seed data for local dev. Runs after migrations when `supabase db reset`.
+-- Leave empty for now; real seed data will use the Supabase JS client in a script
+-- so we get deterministic auth users with passwords.

@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Family-nudge",
+    "slug": "family-nudge",
+    "scheme": "familynudge",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.familynudge.app"
+    },
+    "android": {
+      "package": "dev.familynudge.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-local-authentication",
+      [
+        "expo-notifications",
+        {
+          "color": "#2563eb"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
