@@ -1,0 +1,284 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users & Authentication ───
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  avatarUrl     String?
+  emailVerified Boolean  @default(false)
+  phoneVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  familyMembers  FamilyMember[]
+  reminders      Reminder[]          @relation("CreatedReminders")
+  assignedNudges ReminderAssignee[]
+  documents      Document[]
+  auditLogs      DocumentAuditLog[]
+  sessions       Session[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  deviceInfo   String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ─── Family Groups ───
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  avatarUrl   String?
+  inviteCode  String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members   FamilyMember[]
+  reminders Reminder[]
+  documents Document[]
+  policies  InsurancePolicy[]
+
+  @@map("families")
+}
+
+model FamilyMember {
+  id        String   @id @default(cuid())
+  userId    String
+  familyId  String
+  role      String   @default("MEMBER")
+  nickname  String?
+  joinedAt  DateTime @default(now())
+  isActive  Boolean  @default(true)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, familyId])
+  @@index([familyId])
+  @@map("family_members")
+}
+
+// ─── Smart Reminders ───
+
+model Reminder {
+  id                    String   @id @default(cuid())
+  title                 String
+  description           String?
+  category              String
+  priority              String   @default("MEDIUM")
+  frequency             String   @default("ONCE")
+  channels              String[] @default(["PUSH"])
+  dueDate               DateTime
+  nextDueDate           DateTime?
+  customCronExpression  String?
+  earlyNotificationDays Int      @default(7)
+  isCompleted           Boolean  @default(false)
+  completedAt           DateTime?
+  isSnoozed             Boolean  @default(false)
+  snoozedUntil          DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  createdById String
+  familyId    String
+
+  createdBy User   @relation("CreatedReminders", fields: [createdById], references: [id])
+  family    Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  assignees      ReminderAssignee[]
+  notifications  Notification[]
+  linkedPolicy   InsurancePolicy?   @relation(fields: [linkedPolicyId], references: [id])
+  linkedPolicyId String?
+
+  @@index([familyId, dueDate])
+  @@index([category])
+  @@index([priority])
+  @@index([isCompleted])
+  @@map("reminders")
+}
+
+model ReminderAssignee {
+  id         String   @id @default(cuid())
+  reminderId String
+  userId     String
+  assignedAt DateTime @default(now())
+
+  reminder Reminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reminderId, userId])
+  @@map("reminder_assignees")
+}
+
+// ─── Notification History ───
+
+model Notification {
+  id         String   @id @default(cuid())
+  userId     String
+  reminderId String?
+  channel    String
+  title      String
+  body       String
+  status     String   @default("PENDING")
+  sentAt     DateTime?
+  readAt     DateTime?
+  failReason String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminder Reminder? @relation(fields: [reminderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("notifications")
+}
+
+// ─── Encrypted Document Vault ───
+
+model Document {
+  id              String   @id @default(cuid())
+  name            String
+  category        String
+  description     String?
+  mimeType        String
+  fileSize        Int
+  tags            String[] @default([])
+  encryptedPath   String
+  encryptionKeyId String
+  checksum        String
+  isArchived      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  uploadedById String
+  familyId     String
+  memberId     String?
+
+  uploadedBy User   @relation(fields: [uploadedById], references: [id])
+  family     Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  auditLogs      DocumentAuditLog[]
+  linkedPolicies InsurancePolicy[]  @relation("PolicyDocuments")
+
+  @@index([familyId, category])
+  @@index([tags])
+  @@map("documents")
+}
+
+model DocumentAuditLog {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  action     String
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([documentId, createdAt])
+  @@index([userId, createdAt])
+  @@map("document_audit_logs")
+}
+
+// ─── Insurance & Warranty Tracker ───
+
+model InsurancePolicy {
+  id                    String    @id @default(cuid())
+  name                  String
+  type                  String
+  provider              String
+  policyNumber          String?
+  startDate             DateTime
+  endDate               DateTime
+  premiumAmount         Float?
+  premiumFrequency      String?
+  coverageDetails       String?
+  status                String    @default("ACTIVE")
+  earlyNotificationDays Int       @default(30)
+  lastNotifiedAt        DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  familyId  String
+  memberId  String?
+
+  family    Family     @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  documents Document[] @relation("PolicyDocuments")
+  reminders Reminder[]
+
+  @@index([familyId, endDate])
+  @@index([status])
+  @@index([type])
+  @@map("insurance_policies")
+}
+
+// ─── Maintenance Tracker ───
+
+model MaintenanceItem {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  category      String
+  location      String?
+  frequency     String
+  lastDoneAt    DateTime?
+  nextDueDate   DateTime
+  estimatedCost Float?
+  notes         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  familyId String
+
+  logs MaintenanceLog[]
+
+  @@index([familyId, nextDueDate])
+  @@map("maintenance_items")
+}
+
+model MaintenanceLog {
+  id          String   @id @default(cuid())
+  itemId      String
+  performedAt DateTime @default(now())
+  performedBy String?
+  cost        Float?
+  notes       String?
+  photos      String[] @default([])
+
+  item MaintenanceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, performedAt])
+  @@map("maintenance_logs")
+}
