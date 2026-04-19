@@ -107,29 +107,57 @@ Copy the 64-character hex string. This is your `ENCRYPTION_MASTER_KEY`.
 
 > **Note:** Free tier spins down after 15 min of inactivity. First request after sleep takes ~30s.
 
+### Render Auto-Deploy:
+
+Render also auto-deploys on every push to `main` by default. You can configure this in:
+- Dashboard → your service → **Settings → Build & Deploy → Auto-Deploy** (toggle on/off)
+- You can also set it to only deploy from a specific branch
+
 ---
 
-## Step 5: Deploy Web — Vercel
+## Step 5: Deploy Web — Vercel (Auto-Deploys on Every Push)
 
-1. Go to [vercel.com](https://vercel.com) and sign up (GitHub login works)
+Vercel has **automatic deployments built in**. Once connected to GitHub, every push to `main` auto-deploys to production, and every push to a PR branch creates a preview deploy.
+
+### One-Time Setup (5 minutes):
+
+1. Go to [vercel.com](https://vercel.com) and **sign up with GitHub** (important — use GitHub login)
 2. Click **"Add New" → "Project"**
-3. Import your GitHub repo: `AlbertJoshwa1802011/Family-nudge`
-4. Configure:
+3. You'll see your GitHub repos — find and click **"Import"** next to `AlbertJoshwa1802011/Family-nudge`
+4. Configure these settings:
    - **Framework Preset:** Next.js
-   - **Root Directory:** `apps/web`
-   - **Build Command:** (leave default, Vercel auto-detects)
-   - **Install Command:** `corepack enable && pnpm install`
+   - **Root Directory:** Click "Edit" → type `apps/web` → click "Continue"
+   - **Build Command:** leave as default (auto-detected from `vercel.json`)
+   - **Install Command:** leave as default (auto-detected from `vercel.json`)
+5. Expand **"Environment Variables"** and add:
 
-5. Add **Environment Variables:**
    | Key | Value |
    |-----|-------|
    | `NEXT_PUBLIC_API_URL` | `https://family-nudge-api.onrender.com/api` |
 
-6. Click **"Deploy"**
+6. Click **"Deploy"** — first build takes ~1-2 minutes
 
 7. After deploy, copy your Vercel URL (e.g., `https://family-nudge.vercel.app`)
 
 8. **Go back to Render** and update `CORS_ORIGIN` env var with your Vercel URL
+
+### What Happens Automatically After Setup:
+
+| Git Action | Vercel Behavior |
+|------------|----------------|
+| Push to `main` | Auto-deploys to **production** (your live URL) |
+| Push to any other branch | Creates a **preview deployment** with a unique URL |
+| Open a Pull Request | Preview URL is posted as a comment on the PR |
+| Merge PR to `main` | Auto-deploys the merged code to production |
+
+You never need to manually deploy again — just `git push` and Vercel handles everything.
+
+### Custom Domain (Optional, Free):
+
+1. In Vercel dashboard → your project → **Settings → Domains**
+2. Add your domain (e.g., `familynudge.com`)
+3. Update your DNS records as instructed
+4. Vercel automatically provisions HTTPS certificates
 
 ---
 
