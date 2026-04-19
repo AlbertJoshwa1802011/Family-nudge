@@ -7,18 +7,24 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "familynudge",
+    "newArchEnabled": true,
     "splash": {
       "backgroundColor": "#3b82f6"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.familynudge.app"
+      "bundleIdentifier": "com.familynudge.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Family Nudge uses the camera to scan documents.",
+        "NSPhotoLibraryUsageDescription": "Family Nudge needs photo library access to upload documents."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#3b82f6"
       },
-      "package": "com.familynudge.app"
+      "package": "com.familynudge.app",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "NOTIFICATIONS"]
     },
     "plugins": [
       "expo-router",
@@ -30,6 +36,11 @@
           "color": "#3b82f6"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
   }
 }
