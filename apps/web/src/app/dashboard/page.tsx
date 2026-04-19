@@ -25,7 +25,7 @@ import {
   CheckCheck,
 } from 'lucide-react';
 import { useState } from 'react';
-import { CATEGORY_ICONS } from '@family-nudge/shared';
+import { CATEGORY_ICONS } from '@/lib/constants';
 
 type Tab = 'overview' | 'reminders' | 'documents' | 'policies' | 'maintenance';
 
