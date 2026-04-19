@@ -1,14 +1,12 @@
 import type { NextConfig } from 'next';
 
-const isGitHubPages = process.env.GITHUB_PAGES === 'true';
-
 const nextConfig: NextConfig = {
-  output: 'export',
-  basePath: isGitHubPages ? '/Family-nudge' : '',
-  assetPrefix: isGitHubPages ? '/Family-nudge/' : '',
-  images: {
-    unoptimized: true,
-  },
+  ...(process.env.STATIC_EXPORT === 'true' && {
+    output: 'export',
+    basePath: process.env.BASE_PATH || '',
+    assetPrefix: process.env.ASSET_PREFIX || '',
+    images: { unoptimized: true },
+  }),
 };
 
 export default nextConfig;
