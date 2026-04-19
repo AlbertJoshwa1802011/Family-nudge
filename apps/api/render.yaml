@@ -1,0 +1,30 @@
+# Render Blueprint — deploy API with free tier
+# Place this at the repo root as render.yaml if you want auto-deploy
+
+services:
+  - type: web
+    name: family-nudge-api
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: |
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
+      cd apps/api && npx prisma generate &&
+      cd ../../packages/shared && npx tsc &&
+      cd ../crypto && npx tsc &&
+      cd ../../apps/api && npx tsc
+    startCommand: node apps/api/dist/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_MASTER_KEY
+        sync: false
+      - key: PORT
+        value: 4000
