@@ -3,8 +3,15 @@
 import { useState } from 'react';
 import { Heart, Mail, Lock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuthStore } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const setAuth = useAuthStore((s) => s.setAuth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,20 +23,20 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api'}/auth/login`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        },
-      );
+      const res = await apiFetch<{
+        success: boolean;
+        data: {
+          user: { id: string; email: string; firstName: string; lastName: string };
+          accessToken: string;
+        };
+      }>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Login failed');
-
-      localStorage.setItem('fn_token', data.data.accessToken);
-      window.location.href = '/dashboard';
+      setAuth(res.data.user, res.data.accessToken);
+      const redirect = searchParams.get('redirect') ?? '/dashboard';
+      router.push(redirect);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

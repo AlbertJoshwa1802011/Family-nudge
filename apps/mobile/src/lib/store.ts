@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import * as SecureStore from 'expo-secure-store';
+import { apiFetch, setAuthToken } from './api';
 
 interface User {
   id: string;
@@ -28,10 +30,12 @@ interface AuthState {
   currentFamily: Family | null;
   families: Family[];
   isLoggedIn: boolean;
+  isHydrated: boolean;
   setAuth: (user: User, token: string) => void;
   setFamilies: (families: Family[]) => void;
   setCurrentFamily: (family: Family) => void;
   logout: () => void;
+  hydrate: () => Promise<void>;
 }
 
 const AVATAR_COLORS = [
@@ -43,14 +47,46 @@ export function getAvatarColor(index: number): string {
   return AVATAR_COLORS[index % AVATAR_COLORS.length];
 }
 
+const TOKEN_KEY = 'fn_auth_token';
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   currentFamily: null,
   families: [],
   isLoggedIn: false,
-  setAuth: (user, token) => set({ user, token, isLoggedIn: true }),
+  isHydrated: false,
+
+  setAuth: (user, token) => {
+    SecureStore.setItemAsync(TOKEN_KEY, token).catch(() => {});
+    setAuthToken(token);
+    set({ user, token, isLoggedIn: true });
+  },
+
   setFamilies: (families) => set({ families }),
   setCurrentFamily: (family) => set({ currentFamily: family }),
-  logout: () => set({ user: null, token: null, currentFamily: null, families: [], isLoggedIn: false }),
+
+  logout: () => {
+    SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+    setAuthToken(null);
+    set({ user: null, token: null, currentFamily: null, families: [], isLoggedIn: false });
+  },
+
+  hydrate: async () => {
+    try {
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      if (!token) {
+        set({ isHydrated: true });
+        return;
+      }
+
+      setAuthToken(token);
+      const res = await apiFetch<{ success: boolean; data: User }>('/auth/me');
+      set({ user: res.data, token, isLoggedIn: true, isHydrated: true });
+    } catch {
+      await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+      setAuthToken(null);
+      set({ isHydrated: true });
+    }
+  },
 }));
