@@ -3,8 +3,14 @@
 import { useState } from 'react';
 import { Heart, Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/store';
+import { apiFetch } from '@/lib/api';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const setAuth = useAuthStore((s) => s.setAuth);
+
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -31,26 +37,25 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api'}/auth/register`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName: form.firstName,
-            lastName: form.lastName,
-            email: form.email,
-            phone: form.phone || undefined,
-            password: form.password,
-          }),
-        },
-      );
+      const res = await apiFetch<{
+        success: boolean;
+        data: {
+          user: { id: string; email: string; firstName: string; lastName: string };
+          accessToken: string;
+        };
+      }>('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone || undefined,
+          password: form.password,
+        }),
+      });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Registration failed');
-
-      localStorage.setItem('fn_token', data.data.accessToken);
-      window.location.href = '/dashboard';
+      setAuth(res.data.user, res.data.accessToken);
+      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
