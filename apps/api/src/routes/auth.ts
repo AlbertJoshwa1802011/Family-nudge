@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { HashService } from '@family-nudge/crypto';
@@ -22,9 +22,10 @@ const loginSchema = z.object({
 });
 
 function generateTokens(userId: string, email: string) {
-  const accessToken = jwt.sign({ userId, email }, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
-  });
+  const signOptions: SignOptions = {
+    expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'],
+  };
+  const accessToken = jwt.sign({ userId, email }, process.env.JWT_SECRET as Secret, signOptions);
   const refreshToken = HashService.generateToken(48);
   return { accessToken, refreshToken };
 }

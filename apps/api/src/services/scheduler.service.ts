@@ -40,9 +40,9 @@ async function checkDueReminders(): Promise<void> {
     });
 
     for (const reminder of dueReminders) {
-      const targets =
+      const targets: Array<{ id: string }> =
         reminder.assignees.length > 0
-          ? reminder.assignees.map((a) => a.user)
+          ? reminder.assignees.map((assignee: { user: { id: string } }) => assignee.user)
           : [reminder.createdBy];
 
       for (const user of targets) {

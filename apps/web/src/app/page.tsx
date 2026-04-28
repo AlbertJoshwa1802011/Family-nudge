@@ -21,25 +21,25 @@ const features = [
   {
     icon: Bell,
     title: 'Smart Reminders',
-    description: 'Set criticality levels — from gentle push notifications to automated phone calls for things that truly matter.',
+    description: 'Turn boring follow-ups into automatic action plans, from gentle nudges to automated calls when something truly matters.',
     color: 'bg-blue-500',
   },
   {
     icon: Shield,
     title: 'Insurance & Warranty Tracker',
-    description: 'Never miss a renewal. Get early notifications before policies expire, with all details at your fingertips.',
+    description: 'Never miss a renewal. Keep policy details, proof documents, and renewal timelines together in one family workflow.',
     color: 'bg-emerald-500',
   },
   {
     icon: Lock,
-    title: 'Encrypted Document Vault',
-    description: 'Store passports, birth certificates, and sensitive docs with AES-256 encryption. Full audit trail for every access.',
+    title: 'Secure Family Bucket',
+    description: 'Store passports, certificates, medical records, and receipts in an encrypted S3-style family vault with full audit history.',
     color: 'bg-purple-500',
   },
   {
     icon: Users,
     title: 'Family Groups',
-    description: 'Create family groups with role-based access. Parents, members, children — everyone gets the right level of control.',
+    description: 'Create families with role-based access so parents, members, children, and viewers each see only what they should.',
     color: 'bg-orange-500',
   },
   {
@@ -57,9 +57,9 @@ const features = [
 ];
 
 const stats = [
-  { label: 'Reminder Categories', value: '12+' },
+  { label: 'Boring Problems Automated', value: '12+' },
   { label: 'Notification Channels', value: '5' },
-  { label: 'Encryption Standard', value: 'AES-256' },
+  { label: 'Document Access Modes', value: 'Family + Member' },
   { label: 'Platforms', value: 'Web + Mobile' },
 ];
 
@@ -106,12 +106,13 @@ export default function LandingPage() {
             <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
               {' '}second brain{' '}
             </span>
-            for everything important
+            for every boring but important problem
           </h1>
 
           <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Reminders that escalate. Documents that are encrypted. Policies that never expire unnoticed.
-            One app for all the boring-but-critical stuff families forget.
+            Family Nudge turns messy household operations into clear systems: encrypted family buckets,
+            member-aware access, reminder escalation, and AI-ready workflows for the stuff families should
+            never have to manage manually.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -156,7 +157,7 @@ export default function LandingPage() {
               <span className="text-primary-600">nothing it doesn&apos;t</span>
             </h2>
             <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-              Built for the real problems families face — not another generic to-do app.
+              Built for the operational side of family life - documents, deadlines, maintenance, approvals, and follow-through.
             </p>
           </div>
 
@@ -219,18 +220,19 @@ export default function LandingPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 Your family&apos;s digital safe.
                 <br />
-                <span className="text-purple-600">Encrypted. Audited. Always accessible.</span>
+                <span className="text-purple-600">Encrypted. Bucket-backed. Access-aware.</span>
               </h2>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Stop digging through drawers and email attachments. Upload passports, insurance policies,
-                medical records, and warranties — all encrypted with military-grade AES-256-GCM.
+                Stop digging through drawers and email chains. Upload passports, insurance policies,
+                medical records, warranties, and receipts into a secure family bucket that can be scoped
+                to the whole family or to one specific member.
               </p>
               <ul className="space-y-4">
                 {[
-                  'Every upload, download, and view is logged with full audit trail',
-                  'Role-based access — children can view but not delete',
-                  'Tag and categorize for instant search across all documents',
-                  'Automatic reminders when linked documents expire',
+                  'Every upload, download, and audit view is tracked',
+                  'Family-wide documents and member-private documents can live in the same vault',
+                  'Parents can manage access while children only see what is meant for them',
+                  'Bucket storage can run locally in development or on any S3-compatible provider in production',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <ChevronRight className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
@@ -265,7 +267,7 @@ export default function LandingPage() {
               </div>
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-purple-600">
                 <Clock className="w-4 h-4" />
-                All activity tracked with full audit log
+                All activity tracked with family-aware audit logs
               </div>
             </div>
           </div>
@@ -276,10 +278,10 @@ export default function LandingPage() {
       <section className="py-24 bg-gradient-to-r from-primary-600 to-accent-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Stop letting important things slip through the cracks
+            Make boring family operations feel organized and smart
           </h2>
           <p className="text-xl text-white/80 mb-10">
-            Join families who have taken control of their reminders, documents, and deadlines.
+            Give your family one place for documents, deadlines, ownership, and the nudges that keep life moving.
           </p>
           <a
             href="/register"

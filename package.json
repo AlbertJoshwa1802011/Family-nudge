@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "ci": "pnpm lint && pnpm test && pnpm build",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "db:generate": "pnpm --filter @family-nudge/api exec prisma generate",
     "db:migrate": "pnpm --filter @family-nudge/api exec prisma migrate dev",
@@ -26,5 +27,9 @@
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "turbo": "^2.9.6"
   }
 }

@@ -52,10 +52,10 @@ const mockPolicies = [
 ];
 
 const mockDocuments = [
-  { id: '1', name: 'Passport — John.pdf', category: 'IDENTITY', size: '2.4 MB', uploadedAt: '2026-03-15' },
-  { id: '2', name: 'Home Insurance Policy.pdf', category: 'INSURANCE', size: '890 KB', uploadedAt: '2026-01-02' },
-  { id: '3', name: 'Birth Certificate — Emma.pdf', category: 'IDENTITY', size: '1.1 MB', uploadedAt: '2025-12-10' },
-  { id: '4', name: 'Tax Return 2025.pdf', category: 'FINANCIAL', size: '3.2 MB', uploadedAt: '2026-03-28' },
+  { id: '1', name: 'Passport — John.pdf', category: 'IDENTITY', size: '2.4 MB', uploadedAt: '2026-03-15', scope: 'Member Vault', audience: 'John only + parents', owner: 'John', storage: 'R2 bucket' },
+  { id: '2', name: 'Home Insurance Policy.pdf', category: 'INSURANCE', size: '890 KB', uploadedAt: '2026-01-02', scope: 'Family Vault', audience: 'Entire family', owner: 'Household', storage: 'R2 bucket' },
+  { id: '3', name: 'Birth Certificate — Emma.pdf', category: 'IDENTITY', size: '1.1 MB', uploadedAt: '2025-12-10', scope: 'Member Vault', audience: 'Emma + parents', owner: 'Emma', storage: 'R2 bucket' },
+  { id: '4', name: 'Tax Return 2025.pdf', category: 'FINANCIAL', size: '3.2 MB', uploadedAt: '2026-03-28', scope: 'Manager Only', audience: 'Admins + parents', owner: 'Parents', storage: 'R2 bucket' },
 ];
 
 const CATEGORIES = ['HEALTH', 'FINANCE', 'INSURANCE', 'WARRANTY', 'MAINTENANCE', 'SCHOOL', 'DOCUMENTS', 'FAMILY', 'VEHICLE', 'PETS', 'HOUSEHOLD', 'CUSTOM'] as const;
@@ -786,7 +786,7 @@ export default function DashboardPage() {
           {activeTab === 'documents' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">All documents are AES-256-GCM encrypted at rest</p>
+                <p className="text-sm text-gray-500">Encrypted family bucket with family-wide and member-only access scopes</p>
                 <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-xl hover:bg-purple-700 transition">
                   <Plus className="w-4 h-4" />
                   Upload Document
@@ -804,10 +804,24 @@ export default function DashboardPage() {
                         <div className="font-medium text-gray-900 truncate">{doc.name}</div>
                         <div className="text-sm text-gray-500 mt-1">{doc.category} &middot; {doc.size}</div>
                         <div className="text-xs text-gray-400 mt-2">Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}</div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <span className="px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+                            {doc.scope}
+                          </span>
+                          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs">
+                            {doc.audience}
+                          </span>
+                          <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs">
+                            Owner: {doc.owner}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 text-emerald-500">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-xs">Encrypted</span>
+                      <div className="flex flex-col items-end gap-2 text-emerald-500">
+                        <div className="flex items-center gap-1">
+                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-xs">Encrypted</span>
+                        </div>
+                        <span className="text-[11px] text-gray-400">{doc.storage}</span>
                       </div>
                     </div>
                   </div>

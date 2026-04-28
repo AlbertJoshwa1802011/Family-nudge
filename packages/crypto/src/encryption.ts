@@ -1,4 +1,10 @@
-import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
+import {
+  randomBytes,
+  createCipheriv,
+  createDecipheriv,
+  type CipherGCM,
+  type DecipherGCM,
+} from 'crypto';
 import type { EncryptedPayload, EncryptionOptions } from './types';
 
 const DEFAULT_ALGORITHM = 'aes-256-gcm';
@@ -35,7 +41,7 @@ export class EncryptionService {
     };
 
     if (algorithm === 'aes-256-gcm') {
-      result.tag = (cipher as ReturnType<typeof createCipheriv>).getAuthTag().toString('base64');
+      result.tag = (cipher as CipherGCM).getAuthTag().toString('base64');
     }
 
     return result;
@@ -46,7 +52,7 @@ export class EncryptionService {
     const decipher = createDecipheriv(payload.algorithm, this.masterKey, iv);
 
     if (payload.algorithm === 'aes-256-gcm' && payload.tag) {
-      (decipher as ReturnType<typeof createDecipheriv>).setAuthTag(
+      (decipher as DecipherGCM).setAuthTag(
         Buffer.from(payload.tag, 'base64'),
       );
     }

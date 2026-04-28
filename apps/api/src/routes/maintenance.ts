@@ -59,7 +59,7 @@ maintenanceRouter.get('/family/:familyId', async (req, res, next) => {
       orderBy: { nextDueDate: 'asc' },
     });
 
-    const enriched = items.map((item) => {
+    const enriched = items.map((item: (typeof items)[number]) => {
       const now = new Date();
       const daysUntilDue = Math.ceil(
         (item.nextDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
