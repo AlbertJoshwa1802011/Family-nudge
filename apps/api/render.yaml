@@ -14,7 +14,7 @@ services:
       cd ../../packages/shared && npx tsc &&
       cd ../crypto && npx tsc &&
       cd ../../apps/api && npx tsc
-    startCommand: node apps/api/dist/main.js
+    startCommand: cd apps/api && npx prisma migrate deploy && node dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
