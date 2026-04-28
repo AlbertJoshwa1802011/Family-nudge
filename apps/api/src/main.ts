@@ -12,6 +12,8 @@ import { maintenanceRouter } from './routes/maintenance';
 import { notificationRouter } from './routes/notifications';
 import { errorHandler } from './middleware/error-handler';
 import { requestLogger } from './middleware/request-logger';
+import { prisma } from './lib/prisma';
+import { startScheduler } from './services/scheduler.service';
 
 const logger = pino({
   transport:
@@ -26,8 +28,24 @@ app.use(cors({ origin: process.env.CORS_ORIGIN ?? '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(requestLogger(logger));
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '0.1.0' });
+app.get('/health', async (_req, res) => {
+  const checks: Record<string, string> = {};
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    checks.database = 'ok';
+  } catch {
+    checks.database = 'error';
+  }
+
+  const allOk = Object.values(checks).every((v) => v === 'ok');
+
+  res.status(allOk ? 200 : 503).json({
+    status: allOk ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    version: '0.1.0',
+    checks,
+  });
 });
 
 app.use('/api/auth', authRouter);
@@ -42,6 +60,10 @@ app.use(errorHandler(logger));
 
 app.listen(PORT, () => {
   logger.info(`Family Nudge API running on port ${PORT}`);
+
+  if (process.env.NODE_ENV !== 'test') {
+    startScheduler();
+  }
 });
 
 export { app };

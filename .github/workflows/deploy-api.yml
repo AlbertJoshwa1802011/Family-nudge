@@ -1,0 +1,29 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'prisma/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy API to Render
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            curl -s "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+            echo "Render deploy triggered"
+          else
+            echo "RENDER_DEPLOY_HOOK_URL not configured — skipping deploy"
+            echo "To enable: Render Dashboard → your service → Settings → Deploy Hook → copy URL → add as GitHub secret"
+          fi

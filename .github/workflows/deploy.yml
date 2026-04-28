@@ -1,8 +1,11 @@
-name: Deploy to GitHub Pages
+name: Deploy Web to GitHub Pages
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
   workflow_dispatch:
 
 permissions:
@@ -20,17 +23,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        working-directory: apps/web
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Build
+      - name: Build shared packages
+        run: |
+          pnpm --filter @family-nudge/shared build
+          pnpm --filter @family-nudge/crypto build
+
+      - name: Build web app
         working-directory: apps/web
-        run: npm run build
+        run: pnpm build
         env:
           STATIC_EXPORT: 'true'
           BASE_PATH: '/Family-nudge'

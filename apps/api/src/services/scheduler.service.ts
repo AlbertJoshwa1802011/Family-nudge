@@ -42,7 +42,7 @@ async function checkDueReminders(): Promise<void> {
     for (const reminder of dueReminders) {
       const targets =
         reminder.assignees.length > 0
-          ? reminder.assignees.map((a) => a.user)
+          ? reminder.assignees.map((a: any) => a.user)
           : [reminder.createdBy];
 
       for (const user of targets) {

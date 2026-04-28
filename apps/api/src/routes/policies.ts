@@ -91,7 +91,7 @@ policyRouter.get('/family/:familyId', requireFamilyRole(), async (req, res, next
     });
 
     // Enrich with computed status
-    const enriched = policies.map((policy) => {
+    const enriched = policies.map((policy: any) => {
       const now = new Date();
       const daysUntilExpiry = Math.ceil(
         (policy.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
