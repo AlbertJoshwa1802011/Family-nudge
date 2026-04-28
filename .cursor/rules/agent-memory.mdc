@@ -1,0 +1,19 @@
+---
+description: Maintain durable project memory from chat context
+alwaysApply: true
+---
+
+# Agent Memory
+
+Read `docs/agent-memory.md` at the start of every task.
+
+When the chat contains durable project knowledge, update `docs/agent-memory.md` in the same change:
+
+- User preferences that should apply again later
+- Architecture or product decisions
+- Important commands, environment notes, or operational gotchas
+- Repeated constraints or things to avoid
+- Open questions that should not be lost
+
+Do not add transient status updates, secrets, raw credentials, or one-off implementation details.
+If a detail affects future agent behavior, add it under the most relevant section with the date.
