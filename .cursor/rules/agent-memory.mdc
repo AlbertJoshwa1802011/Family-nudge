@@ -5,7 +5,8 @@ alwaysApply: true
 
 # Agent Memory
 
-Read `docs/agent-memory.md` at the start of every task.
+Read `docs/agent-memory.md` at the start of every substantial task, but use
+only the entries relevant to the current request.
 
 When the chat contains durable project knowledge, update `docs/agent-memory.md` in the same change:
 
@@ -15,5 +16,8 @@ When the chat contains durable project knowledge, update `docs/agent-memory.md` 
 - Repeated constraints or things to avoid
 - Open questions that should not be lost
 
-Do not add transient status updates, secrets, raw credentials, or one-off implementation details.
-If a detail affects future agent behavior, add it under the most relevant section with the date.
+Memory hygiene matters: too much irrelevant context can cause hallucination.
+Do not add transient status updates, secrets, raw credentials, raw chat
+transcripts, speculative interpretations, or one-off implementation details.
+If a detail affects future agent behavior, add it under the most relevant
+section with the date and keep it to one short bullet.

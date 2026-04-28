@@ -1,13 +1,18 @@
 # Agent Memory
 
 This file is the durable project notebook for important context learned from
-conversations and implementation work. Keep it short, factual, and useful to
-future agents.
+conversations and implementation work. Keep it short, factual, high-confidence,
+and useful to future agents.
 
 ## How to use this file
 
 - Add information only when it is expected to matter beyond the current task.
 - Prefer stable facts over temporary observations.
+- Keep entries sparse. Too much memory pollutes task context and can make agents
+  overfit to stale or irrelevant details.
+- Do not convert guesses, inferences, or partial understanding into memory.
+- Use memory as background guidance, not as a replacement for reading current
+  code and the latest user request.
 - Update or remove stale entries when the project changes.
 - Do not store secrets, credentials, private user data, or raw chat transcripts.
 - Preserve existing entries unless they are clearly superseded.
@@ -52,6 +57,8 @@ future agents.
 
 - The user wants a NotebookLM-like memory workflow where important chat-derived
   context is monitored and captured automatically for future work.
+- The user specifically wants automatic memory capture to avoid spoiling the
+  active context; over-collecting knowledge is considered hallucination risk.
 
 ## Decisions
 

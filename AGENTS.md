@@ -4,7 +4,7 @@ This repository uses `docs/agent-memory.md` as its durable project memory.
 
 ## Chat-derived memory protocol
 
-When working from a user chat, actively monitor the conversation for information that should be remembered in future sessions. Treat the memory file like a concise notebook, not a transcript.
+When working from a user chat, actively monitor the conversation for information that should be remembered in future sessions. Treat the memory file like a concise notebook, not a transcript or a context dump.
 
 Add or update memory when the user states:
 
@@ -20,6 +20,8 @@ Do not add:
 - One-off task details that will not matter after the current change.
 - Guesses, uncertain interpretations, or unresolved options.
 - Full chat transcripts.
+- Broad background knowledge that is not specific to this project or user.
+- Repetitive entries that restate existing memory in different words.
 
 Before editing memory, check whether the point already exists and update the existing entry instead of duplicating it. Keep each entry short, dated when useful, and tied to the reason it matters.
 
@@ -27,4 +29,6 @@ If the user asks for a code or documentation change and the chat contains durabl
 
 ## Using memory
 
-At the start of substantial work, read `docs/agent-memory.md` after the README and before making design decisions. Follow the memory unless it conflicts with the user's latest explicit request.
+At the start of substantial work, read `docs/agent-memory.md` after the README and before making design decisions. Use only memory entries that are relevant to the current task. Follow the memory unless it conflicts with the user's latest explicit request.
+
+Memory is meant to reduce repeated explanation, not to dominate the active context. If an entry is not clearly relevant, ignore it for the current task.
