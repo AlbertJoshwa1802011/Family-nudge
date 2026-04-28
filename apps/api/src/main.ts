@@ -12,6 +12,10 @@ import { maintenanceRouter } from './routes/maintenance';
 import { notificationRouter } from './routes/notifications';
 import { errorHandler } from './middleware/error-handler';
 import { requestLogger } from './middleware/request-logger';
+import { startScheduler } from './services/scheduler.service';
+import { notificationService } from './services/notification.service';
+import { getRedis } from './lib/redis';
+import { prisma } from './lib/prisma';
 
 const logger = pino({
   transport:
@@ -26,8 +30,41 @@ app.use(cors({ origin: process.env.CORS_ORIGIN ?? '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(requestLogger(logger));
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '0.1.0' });
+app.get('/health', async (_req, res) => {
+  const checks: Record<string, string> = {};
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    checks.database = 'connected';
+  } catch {
+    checks.database = 'disconnected';
+  }
+
+  const redis = getRedis();
+  if (redis) {
+    try {
+      await redis.ping();
+      checks.redis = 'connected';
+    } catch {
+      checks.redis = 'disconnected';
+    }
+  } else {
+    checks.redis = 'not_configured';
+  }
+
+  checks.twilio = process.env.TWILIO_ACCOUNT_SID ? 'configured' : 'not_configured';
+  checks.smtp = process.env.SMTP_HOST ? 'configured' : 'not_configured';
+  checks.firebase = process.env.FIREBASE_PROJECT_ID ? 'configured' : 'not_configured';
+
+  const allHealthy = checks.database === 'connected';
+
+  res.status(allHealthy ? 200 : 503).json({
+    status: allHealthy ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    version: '0.1.0',
+    services: checks,
+    uptime: process.uptime(),
+  });
 });
 
 app.use('/api/auth', authRouter);
@@ -40,8 +77,15 @@ app.use('/api/notifications', notificationRouter);
 
 app.use(errorHandler(logger));
 
-app.listen(PORT, () => {
-  logger.info(`Family Nudge API running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    logger.info(`Family Nudge API running on port ${PORT}`);
+
+    startScheduler();
+    notificationService.startWorker().catch((err) => {
+      logger.error(err, 'Failed to start notification worker');
+    });
+  });
+}
 
 export { app };
