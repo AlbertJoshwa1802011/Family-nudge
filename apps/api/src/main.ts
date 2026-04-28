@@ -10,6 +10,7 @@ import { documentRouter } from './routes/documents';
 import { policyRouter } from './routes/policies';
 import { maintenanceRouter } from './routes/maintenance';
 import { notificationRouter } from './routes/notifications';
+import { healthRouter } from './routes/health';
 import { errorHandler } from './middleware/error-handler';
 import { requestLogger } from './middleware/request-logger';
 
@@ -26,9 +27,7 @@ app.use(cors({ origin: process.env.CORS_ORIGIN ?? '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(requestLogger(logger));
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '0.1.0' });
-});
+app.use('/health', healthRouter);
 
 app.use('/api/auth', authRouter);
 app.use('/api/families', familyRouter);
@@ -40,8 +39,13 @@ app.use('/api/notifications', notificationRouter);
 
 app.use(errorHandler(logger));
 
-app.listen(PORT, () => {
-  logger.info(`Family Nudge API running on port ${PORT}`);
-});
+const isDirectRun =
+  process.argv[1]?.endsWith('main.js') || process.argv[1]?.endsWith('main.ts');
+
+if (isDirectRun) {
+  app.listen(PORT, () => {
+    logger.info(`Family Nudge API running on port ${PORT}`);
+  });
+}
 
 export { app };
