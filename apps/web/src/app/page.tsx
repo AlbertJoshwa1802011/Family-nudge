@@ -82,6 +82,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition">Features</a>
             <a href="#how-it-works" className="text-sm text-gray-600 hover:text-gray-900 transition">How It Works</a>
+            <a href="/copilot" className="text-sm font-medium text-primary-600 hover:text-primary-700 transition flex items-center gap-1"><Zap className="w-3.5 h-3.5" />Copilot</a>
             <a href="/login" className="text-sm text-gray-600 hover:text-gray-900 transition">Log In</a>
             <a
               href="/register"

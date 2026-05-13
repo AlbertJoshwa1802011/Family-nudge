@@ -23,6 +23,7 @@ import {
   Mail,
   Send,
   CheckCheck,
+  Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import { CATEGORY_ICONS } from '@/lib/constants';
@@ -606,6 +607,13 @@ export default function DashboardPage() {
         </nav>
 
         <div className="p-4 border-t border-gray-100 space-y-1">
+          <a
+            href="/copilot"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-600 bg-gradient-to-r from-primary-50 to-accent-50 border border-primary-100 hover:from-primary-100 hover:to-accent-100 transition"
+          >
+            <Sparkles className="w-5 h-5" />
+            Copilot Agent
+          </a>
           <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
             <Settings className="w-5 h-5" />
             Settings
