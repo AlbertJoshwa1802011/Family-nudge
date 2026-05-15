@@ -23,8 +23,12 @@
       "sharp"
     ]
   },
+  "packageManager": "pnpm@10.33.3",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.14"
   }
 }
